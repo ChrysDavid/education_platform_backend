@@ -1,0 +1,736 @@
+{% extends '../base.html' %}
+
+{% block title %}Détails de l'utilisateur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:user_list' %}">Utilisateurs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ user_detail.get_full_name }}</li>
+        </ol>
+    </nav>
+
+    <!-- En-tête et actions principales -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Profil de {{ user_detail.get_full_name }}</h1>
+        <div>
+            {% if user_detail.verification_status == 'pending' %}
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="verificationActions" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions de vérification
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="verificationActions">
+                        <li>
+                            <form method="post" action="{% url 'accounts:verify_user' user_detail.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="verified">
+                                <button type="submit" class="dropdown-item text-success">
+                                    <i class="bi bi-check-circle"></i> Approuver
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:verify_user' user_detail.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="rejected">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-x-circle"></i> Rejeter
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <!-- Cartes d'information -->
+    <div class="row">
+        <!-- Carte d'informations principales -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_detail.profile_picture %}
+                        <div class="text-center mb-3">
+                            <img src="{{ user_detail.profile_picture.url }}" alt="Photo de profil" class="img-fluid rounded-circle" style="max-width: 150px;">
+                        </div>
+                    {% else %}
+                        <div class="text-center mb-3">
+                            <div class="bg-light rounded-circle d-inline-flex justify-content-center align-items-center" style="width: 150px; height: 150px;">
+                                <i class="bi bi-person" style="font-size: 4rem;"></i>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Nom complet:</span>
+                            <span>{{ user_detail.get_full_name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Email:</span>
+                            <span>{{ user_detail.email }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Type:</span>
+                            <span class="badge 
+                                {% if user_detail.type == 'student' %}bg-primary
+                                {% elif user_detail.type == 'pupil' %}bg-info
+                                {% elif user_detail.type == 'teacher' %}bg-success
+                                {% elif user_detail.type == 'advisor' %}bg-warning
+                                {% endif %}">
+                                {{ user_detail.get_type_display }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Statut:</span>
+                            <span class="badge 
+                                {% if user_detail.verification_status == 'unverified' %}bg-secondary
+                                {% elif user_detail.verification_status == 'pending' %}bg-warning
+                                {% elif user_detail.verification_status == 'verified' %}bg-success
+                                {% elif user_detail.verification_status == 'rejected' %}bg-danger
+                                {% endif %}">
+                                {{ user_detail.get_verification_status_display }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Date d'inscription:</span>
+                            <span>{{ user_detail.date_joined|date:"d/m/Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Téléphone:</span>
+                            <span>{{ user_detail.phone_number|default:"Non renseigné" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Date de naissance:</span>
+                            <span>{{ user_detail.date_of_birth|date:"d/m/Y"|default:"Non renseignée" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte d'adresse et contacts -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Adresse et contacts</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-3 text-muted">Coordonnées personnelles</h6>
+                    <address>
+                        <strong>Adresse:</strong><br>
+                        {% if user_detail.address %}
+                            {{ user_detail.address }}<br>
+                            {% if user_detail.postal_code or user_detail.city %}
+                                {{ user_detail.postal_code }} {{ user_detail.city }}<br>
+                            {% endif %}
+                            {% if user_detail.country %}
+                                {{ user_detail.country }}
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Non renseignée</span>
+                        {% endif %}
+                    </address>
+
+                    <hr>
+
+                    <h6 class="card-subtitle mb-3 text-muted">Contact d'urgence</h6>
+                    {% if user_detail.emergency_contact_name %}
+                        <p><strong>Nom:</strong> {{ user_detail.emergency_contact_name }}</p>
+                        <p><strong>Téléphone:</strong> {{ user_detail.emergency_contact_phone }}</p>
+                        <p><strong>Relation:</strong> {{ user_detail.emergency_contact_relation }}</p>
+                    {% else %}
+                        <p class="text-muted">Aucun contact d'urgence renseigné</p>
+                    {% endif %}
+
+                    <hr>
+
+                    <h6 class="card-subtitle mb-3 text-muted">Préférences de communication</h6>
+                    {% if user_detail.communication_preferences %}
+                        <ul class="list-group list-group-flush">
+                            {% for pref in user_detail.communication_preferences %}
+                                <li class="list-group-item">{{ pref }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Aucune préférence renseignée</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte de vérification -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">Vérification</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="fw-bold">Statut actuel:</span>
+                            <span class="badge 
+                                {% if user_detail.verification_status == 'unverified' %}bg-secondary
+                                {% elif user_detail.verification_status == 'pending' %}bg-warning
+                                {% elif user_detail.verification_status == 'verified' %}bg-success
+                                {% elif user_detail.verification_status == 'rejected' %}bg-danger
+                                {% endif %}">
+                                {{ user_detail.get_verification_status_display }}
+                            </span>
+                        </li>
+                        {% if user_detail.verification_requested_date %}
+                            <li class="list-group-item">
+                                <span class="fw-bold">Date de demande:</span>
+                                <span>{{ user_detail.verification_requested_date|date:"d/m/Y H:i" }}</span>
+                            </li>
+                        {% endif %}
+                        {% if user_detail.verification_completed_date %}
+                            <li class="list-group-item">
+                                <span class="fw-bold">Date de traitement:</span>
+                                <span>{{ user_detail.verification_completed_date|date:"d/m/Y H:i" }}</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    {% if user_detail.verification_notes %}
+                        <hr>
+                        <h6 class="card-subtitle mb-2 text-muted">Notes de vérification</h6>
+                        <div class="alert alert-secondary">
+                            {{ user_detail.verification_notes|linebreaks }}
+                        </div>
+                    {% endif %}
+
+                    {% if user_detail.verification_status == 'pending' %}
+                        <hr>
+                        <form method="post" action="{% url 'accounts:verify_user' user_detail.id %}" class="mt-3">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="verification_notes" class="form-label">Notes de vérification</label>
+                                <textarea class="form-control" id="verification_notes" name="notes" rows="3"></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" name="status" value="verified" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Approuver
+                                </button>
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger">
+                                    <i class="bi bi-x-circle"></i> Rejeter
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents et consentements -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">Documents et consentements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Documents</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Pièce d'identité
+                                    {% if user_detail.identity_document %}
+                                        <a href="{{ user_detail.identity_document.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="bi bi-file-earmark"></i> Voir
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non fourni</span>
+                                    {% endif %}
+                                </li>
+                                {% if user_detail.type == 'teacher' and profile.degree_document %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Document du diplôme
+                                        <a href="{{ profile.degree_document.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="bi bi-file-earmark"></i> Voir
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user_detail.type == 'teacher' and profile.cv %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        CV
+                                        <a href="{{ profile.cv.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="bi bi-file-earmark"></i> Voir
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user_detail.type == 'advisor' and profile.portfolio %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Portfolio
+                                        <a href="{{ profile.portfolio.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="bi bi-file-earmark"></i> Voir
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Consentements</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Traitement des données
+                                    <span class="badge {% if user_detail.data_processing_consent %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if user_detail.data_processing_consent %}Accepté{% else %}Non accepté{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Droit à l'image
+                                    <span class="badge {% if user_detail.image_rights_consent %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if user_detail.image_rights_consent %}Accepté{% else %}Non accepté{% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations spécifiques selon le type d'utilisateur -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">Informations spécifiques - {{ user_detail.get_type_display }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_detail.type == 'student' and profile %}
+                        <!-- Informations spécifiques pour les étudiants -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Informations académiques</h6>
+                                <div class="mb-3">
+                                    <strong>Établissement:</strong>
+                                    <p>{{ profile.institution_name|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Niveau d'études actuel:</strong>
+                                    <p>{{ profile.current_level|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Filière/Spécialité:</strong>
+                                    <p>{{ profile.major|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Année universitaire:</strong>
+                                    <p>{{ profile.academic_year|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Matricule étudiant:</strong>
+                                    <p>{{ profile.student_id|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Moyenne générale:</strong>
+                                    <p>{{ profile.average_grade|default:"Non renseigné" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Bourses et logement</h6>
+                                <div class="mb-3">
+                                    <strong>Boursier:</strong>
+                                    <p>{% if profile.scholarship %}Oui ({{ profile.scholarship_type }}){% else %}Non{% endif %}</p>
+                                </div>
+                                {% if profile.housing_needs %}
+                                    <div class="mb-3">
+                                        <strong>Logement recherché:</strong>
+                                        <ul class="list-group">
+                                            {% for need in profile.housing_needs %}
+                                                <li class="list-group-item">{{ need }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                
+                                <h6 class="border-bottom pb-2 mb-3 mt-4">Compétences et activités</h6>
+                                
+                                {% if profile.internship_search %}
+                                    <div class="mb-3">
+                                        <strong>Stages/Alternance recherchés:</strong>
+                                        <p>{{ profile.internship_search }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if profile.computer_skills %}
+                                    <div class="mb-3">
+                                        <strong>Compétences informatiques:</strong>
+                                        <ul class="list-group">
+                                            {% for skill in profile.computer_skills %}
+                                                <li class="list-group-item">{{ skill }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if profile.extracurricular_activities %}
+                                    <div class="mb-3">
+                                        <strong>Activités extra-universitaires:</strong>
+                                        <p>{{ profile.extracurricular_activities }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if profile.interests %}
+                                    <div class="mb-3">
+                                        <strong>Centres d'intérêt:</strong>
+                                        <ul class="list-group">
+                                            {% for interest in profile.interests %}
+                                                <li class="list-group-item">{{ interest }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                    {% elif user_detail.type == 'pupil' and profile %}
+                        <!-- Informations spécifiques pour les élèves -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Informations scolaires</h6>
+                                <div class="mb-3">
+                                    <strong>Établissement:</strong>
+                                    <p>{{ profile.school_name|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Niveau actuel:</strong>
+                                    <p>{{ profile.current_level|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Section/Spécialité:</strong>
+                                    <p>{{ profile.specialization|default:"Non renseigné" }}</p>
+                                </div>
+                                
+                                <h6 class="border-bottom pb-2 mb-3 mt-4">Services scolaires</h6>
+                                <div class="mb-3">
+                                    <strong>Inscription à la cantine:</strong>
+                                    <p>{% if profile.cafeteria %}Oui{% else %}Non{% endif %}</p>
+                                </div>
+                                {% if profile.dietary_restrictions %}
+                                    <div class="mb-3">
+                                        <strong>Régime alimentaire particulier:</strong>
+                                        <p>{{ profile.dietary_restrictions }}</p>
+                                    </div>
+                                {% endif %}
+                                <div class="mb-3">
+                                    <strong>Utilisation du transport scolaire:</strong>
+                                    <p>{% if profile.school_transport %}Oui{% else %}Non{% endif %}</p>
+                                </div>
+                                {% if profile.transport_details %}
+                                    <div class="mb-3">
+                                        <strong>Détails du transport:</strong>
+                                        <p>{{ profile.transport_details }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Responsables légaux</h6>
+                                <div class="mb-3">
+                                    <strong>Responsable légal:</strong>
+                                    <p>{{ profile.legal_guardian_name|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Téléphone du responsable légal:</strong>
+                                    <p>{{ profile.legal_guardian_phone|default:"Non renseigné" }}</p>
+                                </div>
+                                {% if profile.second_guardian_name %}
+                                    <div class="mb-3">
+                                        <strong>Second responsable légal:</strong>
+                                        <p>{{ profile.second_guardian_name }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Téléphone du second responsable:</strong>
+                                        <p>{{ profile.second_guardian_phone|default:"Non renseigné" }}</p>
+                                    </div>
+                                {% endif %}
+                                
+                                <h6 class="border-bottom pb-2 mb-3 mt-4">Informations médicales et autres</h6>
+                                {% if profile.medical_information %}
+                                    <div class="mb-3">
+                                        <strong>Informations médicales importantes:</strong>
+                                        <p>{{ profile.medical_information }}</p>
+                                    </div>
+                                {% endif %}
+                                <div class="mb-3">
+                                    <strong>Assurance scolaire:</strong>
+                                    <p>{{ profile.school_insurance|default:"Non renseigné" }}</p>
+                                </div>
+                                {% if profile.exit_permissions %}
+                                    <div class="mb-3">
+                                        <strong>Autorisations de sortie:</strong>
+                                        <ul class="list-group">
+                                            {% for permission in profile.exit_permissions %}
+                                                <li class="list-group-item">{{ permission }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                {% if profile.siblings_at_school %}
+                                    <div class="mb-3">
+                                        <strong>Fratrie dans l'établissement:</strong>
+                                        <p>{{ profile.siblings_at_school }}</p>
+                                    </div>
+                                {% endif %}
+                                {% if profile.desired_activities %}
+                                    <div class="mb-3">
+                                        <strong>Activités périscolaires souhaitées:</strong>
+                                        <ul class="list-group">
+                                            {% for activity in profile.desired_activities %}
+                                                <li class="list-group-item">{{ activity }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                    {% elif user_detail.type == 'teacher' and profile %}
+                        <!-- Informations spécifiques pour les enseignants -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Informations professionnelles</h6>
+                                <div class="mb-3">
+                                    <strong>Établissement:</strong>
+                                    <p>{{ profile.institution_name|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Années d'expérience:</strong>
+                                    <p>{{ profile.years_of_experience }} ans</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Diplôme le plus élevé:</strong>
+                                    <p>{{ profile.highest_degree|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>N° de licence professionnelle:</strong>
+                                    <p>{{ profile.professional_license|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Type d'enseignement:</strong>
+                                    <ul class="list-group">
+                                        {% for type in profile.teaching_type %}
+                                            <li class="list-group-item">
+                                                {% if type == 'in_person' %}Présentiel
+                                                {% elif type == 'online' %}En ligne
+                                                {% elif type == 'hybrid' %}Hybride
+                                                {% else %}{{ type }}
+                                                {% endif %}
+                                            </li>
+                                        {% empty %}
+                                            <li class="list-group-item">Non renseigné</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Matières et expertise</h6>
+                                <div class="mb-3">
+                                    <strong>Matières enseignées:</strong>
+                                    <ul class="list-group">
+                                        {% for subject in profile.subjects %}
+                                            <li class="list-group-item">{{ subject }}</li>
+                                        {% empty %}
+                                            <li class="list-group-item">Non renseigné</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% if profile.expertise_areas %}
+                                    <div class="mb-3">
+                                        <strong>Domaines d'expertise:</strong>
+                                        <ul class="list-group">
+                                            {% for area in profile.expertise_areas %}
+                                                <li class="list-group-item">{{ area }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                {% if profile.continuous_education %}
+                                    <div class="mb-3">
+                                        <strong>Formations continues suivies:</strong>
+                                        <ul class="list-group">
+                                            {% for formation in profile.continuous_education %}
+                                                <li class="list-group-item">{{ formation }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                {% if profile.professional_references %}
+                                    <div class="mb-3">
+                                        <strong>Références professionnelles:</strong>
+                                        <p>{{ profile.professional_references }}</p>
+                                    </div>
+                                {% endif %}
+                                {% if profile.availability %}
+                                    <div class="mb-3">
+                                        <strong>Disponibilités:</strong>
+                                        <ul class="list-group">
+                                            {% for day, hours in profile.availability.items %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ day }}:</strong> {{ hours }}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                    {% elif user_detail.type == 'advisor' and profile %}
+                        <!-- Informations spécifiques pour les conseillers d'orientation -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Informations professionnelles</h6>
+                                <div class="mb-3">
+                                    <strong>Organisation/Cabinet:</strong>
+                                    <p>{{ profile.organization }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Spécialité:</strong>
+                                    <p>{{ profile.specialization }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Années d'expérience:</strong>
+                                    <p>{{ profile.years_of_experience }} ans</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>N° de licence professionnelle:</strong>
+                                    <p>{{ profile.professional_license|default:"Non renseigné" }}</p>
+                                </div>
+                                {% elif user_detail.type == 'administrator' and profile %}
+                        <!-- Informations spécifiques pour les administrateurs -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Informations administratives</h6>
+                                <div class="mb-3">
+                                    <strong>Rôle:</strong>
+                                    <p>{{ profile.role }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Département:</strong>
+                                    <p>{{ profile.department|default:"Non renseigné" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Niveau administratif:</strong>
+                                    <p>{{ profile.administrative_level|default:"Non renseigné" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="border-bottom pb-2 mb-3">Responsabilités</h6>
+                                {% if profile.responsibilities %}
+                                    <ul class="list-group">
+                                        {% for responsibility in profile.responsibilities %}
+                                            <li class="list-group-item">{{ responsibility }}</li>
+                                        {% empty %}
+                                            <li class="list-group-item">Aucune responsabilité spécifiée</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">Aucune responsabilité spécifiée</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p>Aucune information spécifique disponible pour ce profil.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons d'action en bas de page -->
+    <div class="row mt-4 mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour à la liste
+                    </a>
+                </div>
+                <div>
+                    {% if perms.auth.change_user %}
+                        <a href="" class="btn btn-warning me-2">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                    {% endif %}
+                    {% if perms.auth.delete_user and not user_detail.is_superuser %}
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+{% if perms.auth.delete_user and not user_detail.is_superuser %}
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteUserModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{ user_detail.get_full_name }}</strong> ?</p>
+                <p class="text-danger">Cette action est irréversible et supprimera toutes les données associées à cet utilisateur.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal pour envoyer un message à l'utilisateur -->
+<div class="modal fade" id="contactUserModal" tabindex="-1" aria-labelledby="contactUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="contactUserModalLabel">Contacter {{ user_detail.get_full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Sujet</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

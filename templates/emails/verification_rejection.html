@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Décision concernant votre demande de vérification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ platform_name }}</h1>
+        <h2>Information sur votre demande de vérification</h2>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.first_name }},</p>
+        
+        <div class="error">
+            <p><strong>Nous sommes désolés</strong> de vous informer que votre demande de vérification (référence #{{ request.id }}) a été rejetée.</p>
+        </div>
+        
+        <p>Suite à l'examen de votre demande, notre équipe n'a pas pu valider votre compte pour la raison suivante :</p>
+        
+        <p><strong>{{ reason }}</strong></p>
+        
+        <p>Nous vous invitons à soumettre une nouvelle demande en tenant compte des éléments suivants :</p>
+        
+        <ul>
+            <li>Vérifiez que les documents fournis sont lisibles et complets</li>
+            <li>Assurez-vous que les informations correspondent à votre profil</li>
+            <li>Utilisez des formats de fichiers acceptés (PDF, JPG, PNG)</li>
+            <li>Respectez les consignes spécifiques à votre type de profil</li>
+        </ul>
+        
+        <p>Vous pouvez créer une nouvelle demande en cliquant sur le lien ci-dessous :</p>
+        
+        <a href="{{ frontend_url }}/verification/new-request" class="button">Nouvelle demande</a>
+        
+        <p>Si vous avez des questions ou avez besoin d'assistance, n'hésitez pas à contacter notre équipe de support.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ce message a été envoyé par {{ platform_name }}.</p>
+        <p>© {{ current_year }} {{ platform_name }} - Tous droits réservés</p>
+    </div>
+</body>
+</html>

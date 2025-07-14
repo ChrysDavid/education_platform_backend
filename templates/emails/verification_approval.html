@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Votre demande de vérification a été approuvée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ platform_name }}</h1>
+        <h2>Votre demande de vérification a été approuvée</h2>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.first_name }},</p>
+        
+        <div class="success">
+            <p><strong>Félicitations !</strong> Votre demande de vérification a été approuvée.</p>
+        </div>
+        
+        <p>Nous sommes heureux de vous informer que votre demande de vérification (référence #{{ request.id }}) a été examinée et approuvée par notre équipe.</p>
+        
+        <p>Votre compte est maintenant vérifié, ce qui vous permet d'accéder à toutes les fonctionnalités de notre plateforme :</p>
+        
+        <ul>
+            {% if user.type == 'student' %}
+            <li>Accès aux profils complets des enseignants et conseillers</li>
+            <li>Possibilité de contacter directement les professeurs et conseillers</li>
+            <li>Accès à toutes les ressources pédagogiques</li>
+            <li>Participation aux forums et discussions</li>
+            {% elif user.type == 'teacher' %}
+            <li>Publication de ressources pédagogiques</li>
+            <li>Accès aux profils de vos élèves</li>
+            <li>Création de cours et d'évaluations</li>
+            <li>Communication directe avec les élèves et conseillers</li>
+            {% elif user.type == 'advisor' %}
+            <li>Publication de recommandations et conseils d'orientation</li>
+            <li>Communication directe avec les élèves et enseignants</li>
+            <li>Accès aux profils complets des élèves</li>
+            <li>Création de parcours d'orientation personnalisés</li>
+            {% endif %}
+        </ul>
+        
+        <p>Vous pouvez dès maintenant accéder à votre espace personnel :</p>
+        
+        <a href="{{ frontend_url }}/dashboard" class="button">Accéder à mon espace</a>
+        
+        <p>Nous vous remercions pour votre confiance et vous souhaitons une excellente expérience sur notre plateforme.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ce message a été envoyé par {{ platform_name }}.</p>
+        <p>© {{ current_year }} {{ platform_name }} - Tous droits réservés</p>
+    </div>
+</body>
+</html>

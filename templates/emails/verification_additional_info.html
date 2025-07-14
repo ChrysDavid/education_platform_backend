@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Informations complémentaires requises</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ platform_name }}</h1>
+        <h2>Informations complémentaires requises</h2>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.first_name }},</p>
+        
+        <div class="info">
+            <p><strong>Information importante :</strong> Nous avons besoin d'informations ou de documents supplémentaires pour traiter votre demande de vérification (référence #{{ request.id }}).</p>
+        </div>
+        
+        <p>Après examen de votre demande, notre équipe a besoin des éléments suivants :</p>
+        
+        <div style="padding: 15px; background-color: #f8f9fa; border-left: 4px solid #6c757d; margin: 15px 0;">
+            {{ notes|linebreaks }}
+        </div>
+        
+        <p>Votre demande restera en attente jusqu'à ce que ces informations soient fournies. Pour ajouter ces documents ou informations :</p>
+        
+        <ol>
+            <li>Connectez-vous à votre compte</li>
+            <li>Accédez à la section "Vérification"</li>
+            <li>Sélectionnez votre demande en cours</li>
+            <li>Ajoutez les documents ou informations demandés</li>
+        </ol>
+        
+        <a href="{{ frontend_url }}/verification/requests/{{ request.id }}" class="button">Compléter ma demande</a>
+        
+        <p>Si vous avez des questions ou rencontrez des difficultés, n'hésitez pas à contacter notre équipe de support.</p>
+        
+        <p>Nous vous remercions pour votre collaboration et restons à votre disposition pour toute information complémentaire.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ce message a été envoyé par {{ platform_name }}.</p>
+        <p>© {{ current_year }} {{ platform_name }} - Tous droits réservés</p>
+    </div>
+</body>
+</html>

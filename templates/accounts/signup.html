@@ -1,0 +1,141 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="{% static 'images/favicon.svg' %}" type="image/x-icon" />
+  <title>Inscription | Mon Application</title>
+
+  <!-- ========== All CSS files linkup ========= -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/lineicons.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/quill/bubble.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/quill/snow.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/morris.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/datatable.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+</head>
+
+<body>
+
+    <section class="signin-section">
+      <div class="container-fluid">
+        <div class="row g-0 auth-row">
+          <div class="col-lg-6">
+            <div class="auth-cover-wrapper bg-primary-100">
+              <div class="auth-cover">
+                <div class="title text-center">
+                  <h1 class="text-primary mb-10">Commencer</h1>
+                  <p class="text-medium">
+                    Commencez à créer la meilleure expérience utilisateur possible
+                    <br class="d-sm-block" />
+                    pour vos clients.
+                  </p>
+                </div>
+                <div class="cover-image">
+                  <img src="{% static 'images/auth/signin-image.svg' %}" alt="" />
+                </div>
+                <div class="shape-image">
+                  <img src="{% static 'images/auth/shape.svg' %}" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end col -->
+          <div class="col-lg-6">
+            <div class="signup-wrapper">
+              <div class="form-wrapper">
+                <h6 class="mb-15">Formulaire d'inscription</h6>
+                <p class="text-sm mb-25">
+                  Commencez à créer la meilleure expérience utilisateur possible pour vos clients.
+                </p>
+                <form action="" method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="input-style-1">
+                        <label>Nom</label>
+                        <input type="text" name="name" placeholder="Nom" required />
+                      </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-12">
+                      <div class="input-style-1">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="Email" required />
+                      </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-12">
+                      <div class="input-style-1">
+                        <label>Mot de passe</label>
+                        <input type="password" name="password" placeholder="Mot de passe" required />
+                      </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-12">
+                      <div class="form-check checkbox-style mb-30">
+                        <input class="form-check-input" type="checkbox" value="" id="checkbox-not-robot" />
+                        <label class="form-check-label" for="checkbox-not-robot">
+                          Je ne suis pas un robot</label>
+                      </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-12">
+                      <div class="button-group d-flex justify-content-center flex-wrap">
+                        <button type="submit" class="main-btn primary-btn btn-hover w-100 text-center">
+                          S'inscrire
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- end row -->
+                </form>
+                <div class="singup-option pt-40">
+                  <p class="text-sm text-medium text-center text-gray">
+                    Inscription simplifiée avec
+                  </p>
+                  <div class="button-group pt-40 pb-40 d-flex justify-content-center flex-wrap">
+                    <button class="main-btn primary-btn-outline m-2">
+                      <i class="lni lni-facebook-fill mr-10"></i>
+                      Facebook
+                    </button>
+                    <button class="main-btn danger-btn-outline m-2">
+                      <i class="lni lni-google mr-10"></i>
+                      Google
+                    </button>
+                  </div>
+                  <p class="text-sm text-medium text-dark text-center">
+                    Vous avez déjà un compte? <a href="">Se connecter</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end col -->
+        </div>
+      </div>
+    </section>
+
+
+  <!-- ========= All Javascript files linkup ======== -->
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/Chart.min.js' %}"></script>
+  <script src="{% static 'js/apexcharts.min.js' %}"></script>
+  <script src="{% static 'js/dynamic-pie-chart.js' %}"></script>
+  <script src="{% static 'js/moment.min.js' %}"></script>
+  <script src="{% static 'js/fullcalendar.js' %}"></script>
+  <script src="{% static 'js/jvectormap.min.js' %}"></script>
+  <script src="{% static 'js/world-merc.js' %}"></script>
+  <script src="{% static 'js/polyfill.js' %}"></script>
+  <script src="{% static 'js/quill.min.js' %}"></script>
+  <script src="{% static 'js/datatable.js' %}"></script>
+  <script src="{% static 'js/Sortable.min.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

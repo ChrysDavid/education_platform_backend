@@ -1,0 +1,598 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Vérification du compte de {{ user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Détails de vérification de compte</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="">Tableau de bord</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'verification:verification_list' %}">Vérifications</a></li>
+        <li class="breadcrumb-item active">{{ user.get_full_name }}</li>
+    </ol>
+
+    <!-- État actuel de la vérification -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-user-check me-1"></i>
+                État de la vérification
+            </div>
+            {% if user.verification_status == 'pending' %}
+                <span class="badge bg-warning text-dark">En attente</span>
+            {% elif user.verification_status == 'verified' %}
+                <span class="badge bg-success">Vérifié</span>
+            {% elif user.verification_status == 'rejected' %}
+                <span class="badge bg-danger">Rejeté</span>
+            {% else %}
+                <span class="badge bg-secondary">Non vérifié</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Date de demande:</strong> 
+                        {% if user.verification_requested_date %}
+                            {{ user.verification_requested_date|date:"d/m/Y à H:i" }}
+                        {% else %}
+                            Non demandée
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date de complétion:</strong> 
+                        {% if user.verification_completed_date %}
+                            {{ user.verification_completed_date|date:"d/m/Y à H:i" }}
+                        {% else %}
+                            Non complétée
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% if user.verification_notes %}
+                <div class="alert alert-info mt-3">
+                    <strong>Notes précédentes:</strong><br>
+                    {{ user.verification_notes }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Informations générales de l'utilisateur -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user me-1"></i>
+            Informations générales
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {% if documents.profile_picture %}
+                        <img src="{{ documents.profile_picture.url }}" class="img-fluid rounded" style="max-height: 200px;" alt="Photo de profil">
+                    {% else %}
+                        <div class="text-center p-4 bg-light rounded">
+                            <i class="fas fa-user fa-4x text-secondary"></i>
+                            <p class="mt-2">Pas de photo de profil</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h4>{{ user.get_full_name }} <small class="text-muted">({{ user_type_display }})</small></h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Téléphone:</strong> {{ user.phone_number|default:"Non spécifié" }}</p>
+                            <p><strong>Date de naissance:</strong> {{ user.date_of_birth|date:"d/m/Y"|default:"Non spécifiée" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Adresse:</strong> {{ user.address|default:"Non spécifiée" }}</p>
+                            <p><strong>Ville:</strong> {{ user.city|default:"Non spécifiée" }}</p>
+                            <p><strong>Code postal:</strong> {{ user.postal_code|default:"Non spécifié" }}</p>
+                            <p><strong>Pays:</strong> {{ user.country|default:"Non spécifié" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if documents.identity_document %}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Pièce d'identité</h5>
+                        <a href="{{ documents.identity_document.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="fas fa-external-link-alt me-1"></i> Voir le document
+                        </a>
+                    </div>
+                    <div class="alert alert-info">
+                        Document d'identité fourni. Cliquez pour visualiser.
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Aucune pièce d'identité fournie.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Profil spécifique selon le type d'utilisateur -->
+    {% if profile %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-id-card me-1"></i>
+                Profil spécifique de {{ user_type_display }}
+            </div>
+            <div class="card-body">
+                {% if user.type == 'student' %}
+                    <!-- Informations spécifiques aux étudiants -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Informations académiques</h5>
+                            <p><strong>Établissement:</strong> {{ profile.institution_name|default:"Non spécifié" }}</p>
+                            <p><strong>Niveau d'études:</strong> {{ profile.current_level|default:"Non spécifié" }}</p>
+                            <p><strong>Spécialité/Filière:</strong> {{ profile.major|default:"Non spécifiée" }}</p>
+                            <p><strong>Année universitaire:</strong> {{ profile.academic_year|default:"Non spécifiée" }}</p>
+                            <p><strong>Matricule étudiant:</strong> {{ profile.student_id|default:"Non spécifié" }}</p>
+                            <p><strong>Moyenne générale:</strong> {{ profile.average_grade|default:"Non spécifiée" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Bourse et logement</h5>
+                            <p><strong>Boursier:</strong> {% if profile.scholarship %}Oui{% else %}Non{% endif %}</p>
+                            {% if profile.scholarship %}
+                                <p><strong>Type de bourse:</strong> {{ profile.scholarship_type|default:"Non spécifié" }}</p>
+                            {% endif %}
+                            
+                            {% if profile.housing_needs %}
+                                <h6 class="mt-3">Logement recherché:</h6>
+                                <ul>
+                                    {% for need in profile.housing_needs %}
+                                        <li>{{ need }}</li>
+                                    {% empty %}
+                                        <li>Aucun besoin spécifié</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Compétences et activités</h5>
+                            <p><strong>Stages/alternance recherchés:</strong><br>{{ profile.internship_search|default:"Non spécifié"|linebreaks }}</p>
+                            
+                            {% if profile.computer_skills %}
+                                <h6>Compétences informatiques:</h6>
+                                <ul>
+                                    {% for skill in profile.computer_skills %}
+                                        <li>{{ skill }}</li>
+                                    {% empty %}
+                                        <li>Aucune compétence spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Centres d'intérêt</h5>
+                            {% if profile.interests %}
+                                <ul>
+                                    {% for interest in profile.interests %}
+                                        <li>{{ interest }}</li>
+                                    {% empty %}
+                                        <li>Aucun centre d'intérêt spécifié</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucun centre d'intérêt spécifié</p>
+                            {% endif %}
+                            
+                            <h6 class="mt-3">Activités extra-universitaires:</h6>
+                            <p>{{ profile.extracurricular_activities|default:"Non spécifiées"|linebreaks }}</p>
+                        </div>
+                    </div>
+                
+                {% elif user.type == 'pupil' %}
+                    <!-- Informations spécifiques aux élèves -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Informations scolaires</h5>
+                            <p><strong>Établissement:</strong> {{ profile.school_name|default:"Non spécifié" }}</p>
+                            <p><strong>Niveau actuel:</strong> {{ profile.current_level|default:"Non spécifié" }}</p>
+                            <p><strong>Section/Spécialité:</strong> {{ profile.specialization|default:"Non spécifiée" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Responsables légaux</h5>
+                            <p><strong>Responsable principal:</strong> {{ profile.legal_guardian_name|default:"Non spécifié" }}</p>
+                            <p><strong>Téléphone:</strong> {{ profile.legal_guardian_phone|default:"Non spécifié" }}</p>
+                            
+                            {% if profile.second_guardian_name %}
+                                <p><strong>Second responsable:</strong> {{ profile.second_guardian_name }}</p>
+                                <p><strong>Téléphone:</strong> {{ profile.second_guardian_phone|default:"Non spécifié" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Services scolaires</h5>
+                            <p><strong>Inscription à la cantine:</strong> {% if profile.cafeteria %}Oui{% else %}Non{% endif %}</p>
+                            {% if profile.cafeteria and profile.dietary_restrictions %}
+                                <p><strong>Régime alimentaire particulier:</strong> {{ profile.dietary_restrictions }}</p>
+                            {% endif %}
+                            
+                            <p><strong>Transport scolaire:</strong> {% if profile.school_transport %}Oui{% else %}Non{% endif %}</p>
+                            {% if profile.school_transport %}
+                                <p><strong>Détails transport:</strong> {{ profile.transport_details|default:"Non spécifiés" }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Informations médicales</h5>
+                            <p><strong>Informations médicales:</strong><br>{{ profile.medical_information|default:"Aucune information médicale spécifiée"|linebreaks }}</p>
+                            <p><strong>Assurance scolaire:</strong> {{ profile.school_insurance|default:"Non spécifiée" }}</p>
+                            
+                            {% if profile.exit_permissions %}
+                                <h6 class="mt-3">Autorisations de sortie:</h6>
+                                <ul>
+                                    {% for permission in profile.exit_permissions %}
+                                        <li>{{ permission }}</li>
+                                    {% empty %}
+                                        <li>Aucune autorisation spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                {% elif user.type == 'teacher' %}
+                    <!-- Informations spécifiques aux enseignants -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Informations professionnelles</h5>
+                            <p><strong>Établissement:</strong> {{ profile.institution_name|default:"Non spécifié" }}</p>
+                            <p><strong>Diplôme le plus élevé:</strong> {{ profile.highest_degree|default:"Non spécifié" }}</p>
+                            <p><strong>Années d'expérience:</strong> {{ profile.years_of_experience }}</p>
+                            <p><strong>Type d'enseignement:</strong>
+                                {% if profile.teaching_type %}
+                                    {{ profile.teaching_type|join:", " }}
+                                {% else %}
+                                    Non spécifié
+                                {% endif %}
+                            </p>
+                            <p><strong>Qualifications:</strong> {{ profile.qualifications|default:"Non spécifiées" }}</p>
+                            <p><strong>Licence professionnelle:</strong> {{ profile.professional_license|default:"Non spécifiée" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Matières enseignées</h5>
+                            {% if profile.subjects %}
+                                <ul>
+                                    {% for subject in profile.subjects %}
+                                        <li>{{ subject }}</li>
+                                    {% empty %}
+                                        <li>Aucune matière spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune matière spécifiée</p>
+                            {% endif %}
+                            
+                            <h5 class="mt-3">Domaines d'expertise</h5>
+                            {% if profile.expertise_areas %}
+                                <ul>
+                                    {% for area in profile.expertise_areas %}
+                                        <li>{{ area }}</li>
+                                    {% empty %}
+                                        <li>Aucun domaine spécifié</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucun domaine spécifié</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h5>Documents fournis</h5>
+                            <div class="row">
+                                {% if documents.degree_document %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Diplôme</h6>
+                                                <p class="card-text">Document attestant du diplôme le plus élevé</p>
+                                                <a href="{{ documents.degree_document.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                                    <i class="fas fa-file-pdf me-1"></i> Consulter
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if documents.cv %}
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">CV</h6>
+                                                <p class="card-text">Curriculum Vitae complet</p>
+                                                <a href="{{ documents.cv.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                                    <i class="fas fa-file-alt me-1"></i> Consulter
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if not documents.degree_document and not documents.cv %}
+                                    <div class="col-12">
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Aucun document professionnel fourni.
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Formation continue</h5>
+                            {% if profile.continuous_education %}
+                                <ul>
+                                    {% for education in profile.continuous_education %}
+                                        <li>{{ education }}</li>
+                                    {% empty %}
+                                        <li>Aucune formation continue spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune formation continue spécifiée</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Références professionnelles</h5>
+                            <p>{{ profile.professional_references|default:"Aucune référence fournie"|linebreaks }}</p>
+                        </div>
+                    </div>
+                
+                {% elif user.type == 'advisor' %}
+                    <!-- Informations spécifiques aux conseillers d'orientation -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Informations professionnelles</h5>
+                            <p><strong>Organisation:</strong> {{ profile.organization|default:"Non spécifiée" }}</p>
+                            <p><strong>Spécialité du conseil:</strong> {{ profile.specialization|default:"Non spécifiée" }}</p>
+                            <p><strong>Années d'expérience:</strong> {{ profile.years_of_experience }}</p>
+                            <p><strong>Licence professionnelle:</strong> {{ profile.professional_license|default:"Non spécifiée" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Certifications</h5>
+                            {% if profile.certifications %}
+                                <ul>
+                                    {% for certification in profile.certifications %}
+                                        <li>{{ certification }}</li>
+                                    {% empty %}
+                                        <li>Aucune certification spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune certification spécifiée</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Zones d'intervention</h5>
+                            {% if profile.geographical_areas %}
+                                <ul>
+                                    {% for area in profile.geographical_areas %}
+                                        <li>{{ area }}</li>
+                                    {% empty %}
+                                        <li>Aucune zone spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune zone spécifiée</p>
+                            {% endif %}
+                            
+                            <h5 class="mt-3">Publications</h5>
+                            {% if profile.publications %}
+                                <ul>
+                                    {% for publication in profile.publications %}
+                                        <li>{{ publication }}</li>
+                                    {% empty %}
+                                        <li>Aucune publication spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune publication spécifiée</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Documents fournis</h5>
+                            {% if documents.portfolio %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Portfolio</h6>
+                                        <p class="card-text">Portfolio ou exemples de réalisations</p>
+                                        <a href="{{ documents.portfolio.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                            <i class="fas fa-file me-1"></i> Consulter
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if profile.portfolio_link %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Portfolio en ligne</h6>
+                                        <a href="{{ profile.portfolio_link }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-external-link-alt me-1"></i> Visiter
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if not documents.portfolio and not profile.portfolio_link %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Aucun portfolio fourni.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                {% elif user.type == 'administrator' %}
+                    <!-- Informations spécifiques aux administrateurs -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Fonction administrative</h5>
+                            <p><strong>Rôle:</strong> {{ profile.role|default:"Non spécifié" }}</p>
+                            <p><strong>Département:</strong> {{ profile.department|default:"Non spécifié" }}</p>
+                            <p><strong>Niveau administratif:</strong> {{ profile.administrative_level|default:"Non spécifié" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Responsabilités</h5>
+                            {% if profile.responsibilities %}
+                                <ul>
+                                    {% for responsibility in profile.responsibilities %}
+                                        <li>{{ responsibility }}</li>
+                                    {% empty %}
+                                        <li>Aucune responsabilité spécifiée</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>Aucune responsabilité spécifiée</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning mb-4">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            Aucun profil spécifique trouvé pour cet utilisateur.
+        </div>
+    {% endif %}
+
+    <!-- Consentements et préférences -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-clipboard-check me-1"></i>
+            Consentements et préférences
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Consentements</h5>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="me-2">
+                            {% if user.data_processing_consent %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                            {% endif %}
+                        </div>
+                        <div>Traitement des données personnelles</div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="me-2">
+                            {% if user.image_rights_consent %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                            {% endif %}
+                        </div>
+                        <div>Droit à l'image</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Préférences de communication</h5>
+                    {% if user.communication_preferences %}
+                        <ul>
+                            {% for pref in user.communication_preferences %}
+                                <li>{{ pref }}</li>
+                            {% empty %}
+                                <li>Aucune préférence spécifiée</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Aucune préférence spécifiée</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h5>Langues parlées</h5>
+                    {% if user.languages %}
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Langue</th>
+                                    <th>Niveau</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lang, level in user.languages.items %}
+                                    <tr>
+                                        <td>{{ lang }}</td>
+                                        <td>{{ level }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Aucune langue spécifiée</p>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Contact d'urgence</h5>
+                    {% if user.emergency_contact_name %}
+                        <p><strong>Nom:</strong> {{ user.emergency_contact_name }}</p>
+                        <p><strong>Téléphone:</strong> {{ user.emergency_contact_phone|default:"Non spécifié" }}</p>
+                        <p><strong>Relation:</strong> {{ user.emergency_contact_relation|default:"Non spécifiée" }}</p>
+                    {% else %}
+                        <p>Aucun contact d'urgence spécifié</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire de décision -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-check me-1"></i>
+            Décision de vérification
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'verification:user_verification_detail' user.id %}">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="verification_notes">Notes de vérification</label>
+                    <textarea class="form-control" id="verification_notes" name="verification_notes" rows="4" placeholder="Ajoutez vos notes concernant cette vérification..."></textarea>
+                </div>
+                
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" name="action" value="approve" class="btn btn-success mx-2">
+                        <i class="fas fa-check-circle me-1"></i> Approuver
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger mx-2">
+                        <i class="fas fa-times-circle me-1"></i> Rejeter
+                    </button>
+                    <a href="{% url 'verification:verification_list' %}" class="btn btn-secondary mx-2">
+                        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

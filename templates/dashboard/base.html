@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="shortcut icon" href="{% static 'images/favicon.svg' %}" type="image/x-icon" />
+
+  <title>{% block title %}Dashboard{% endblock %}</title>
+
+  <!-- Lineicons v4 CDN avec fichiers de polices inclus -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- ========== Other CSS ========== -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/quill/bubble.css' %}">
+  <link rel="stylesheet" href="{% static 'css/quill/snow.css' %}">
+  <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/morris.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatable.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  <!-- ======== Preloader =========== -->
+  <div id="preloader">
+    <div class="spinner"></div>
+  </div>
+  <!-- ======== Preloader =========== -->
+
+  <!-- Include sidebar -->
+  {% include 'dashboard/partials/sidebar.html' %}
+
+  <div class="overlay"></div>
+
+  <!-- ======== main-wrapper start =========== -->
+  <main class="main-wrapper">
+    <!-- Include header -->
+    {% include 'dashboard/partials/header.html' %}
+
+    <!-- Main content section -->
+    {% block content %}{% endblock %}
+
+    <!-- Include footer -->
+    {% include 'dashboard/partials/footer.html' %}
+  </main>
+
+  <!-- ============ Theme Option Start ============= -->
+  <!-- <button class="option-btn">
+    <i class="lni lni-cog"></i>
+  </button> -->
+
+  <!-- <div class="option-overlay"></div>
+  <div class="option-box">
+    <div class="option-header">
+      <div>
+        <h5>Theme Customizer</h5>
+        <p class="text-gray">Customize and Preview in Real time</p>
+      </div>
+      <button class="option-btn-close text-gray">
+        <i class="lni lni-close"></i>
+      </button>
+    </div>
+    <h6 class="mb-10">Sidebar</h6>
+    <ul class="mb-30">
+      <li><button class="leftSidebarButton active">Left Sidebar</button></li>
+      <li><button class="rightSidebarButton">Right Sidebar</button></li>
+    </ul>
+
+    <h6 class="mb-10">Theme</h6>
+    <ul class="d-flex flex-wrap align-items-center">
+      <li>
+        <button class="lightThemeButton active">
+          Light Theme + Sidebar 1
+        </button>
+      </li>
+      <li><button class="darkThemeButton">Dark Theme + Sidebar 1</button></li>
+    </ul>
+
+    <div class="promo-box">
+      <div class="promo-icon">
+        <img class="mx-auto" src="./assets/images/logo/logo-icon-big.svg" alt="Logo">
+      </div>
+      <h3>Upgrade to PRO</h3>
+      <p>Improve your development process and start doing more with PlainAdmin PRO!</p>
+      <a href="https://plainadmin.com/pro" target="_blank" rel="nofollow" class="main-btn primary-btn btn-hover">
+        Upgrade to PRO
+      </a>
+    </div>
+  </div> -->
+
+  <!-- ========= All Javascript files linkup ======== -->
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/Chart.min.js' %}"></script>
+  <script src="{% static 'js/apexcharts.min.js' %}"></script>
+  <script src="{% static 'js/dynamic-pie-chart.js' %}"></script>
+  <script src="{% static 'js/moment.min.js' %}"></script>
+  <script src="{% static 'js/fullcalendar.js' %}"></script>
+  <script src="{% static 'js/jvectormap.min.js' %}"></script>
+  <script src="{% static 'js/world-merc.js' %}"></script>
+  <script src="{% static 'js/polyfill.js' %}"></script>
+  <script src="{% static 'js/quill.min.js' %}"></script>
+  <script src="{% static 'js/datatable.js' %}"></script>
+  <script src="{% static 'js/Sortable.min.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

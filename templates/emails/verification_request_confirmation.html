@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de votre demande de vérification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ platform_name }}</h1>
+        <h2>Confirmation de votre demande de vérification</h2>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.first_name }},</p>
+        
+        <p>Nous confirmons la réception de votre demande de vérification sur notre plateforme. Votre demande a été enregistrée sous la référence #{{ request.id }} et est actuellement en cours de traitement.</p>
+        
+        {% if missing_documents %}
+        <div class="warning">
+            <p><strong>Attention :</strong> Certains documents requis sont manquants dans votre demande :</p>
+            <ul>
+                {% for doc in missing_documents %}
+                <li>{{ doc.name }}</li>
+                {% endfor %}
+            </ul>
+            <p>Veuillez ajouter ces documents pour compléter votre demande de vérification.</p>
+        </div>
+        {% else %}
+        <p>Tous les documents requis ont été fournis. Votre demande sera traitée dans les meilleurs délais.</p>
+        {% endif %}
+        
+        <p>Un administrateur examinera votre demande et les documents fournis. Vous serez notifié par email de tout changement du statut de votre demande.</p>
+        
+        <p>Pour suivre l'avancement de votre demande ou ajouter des documents complémentaires :</p>
+        
+        <a href="{{ frontend_url }}/verification/requests/{{ request.id }}" class="button">Voir ma demande</a>
+        
+        <p>En cas de question ou de besoin d'assistance, n'hésitez pas à nous contacter.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ce message a été envoyé par {{ platform_name }}.</p>
+        <p>© {{ current_year }} {{ platform_name }} - Tous droits réservés</p>
+    </div>
+</body>
+</html>
