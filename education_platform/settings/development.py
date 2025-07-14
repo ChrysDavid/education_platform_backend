@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-change-this-in-production-and-use-env-variables'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'education-platform-7kl4.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Database

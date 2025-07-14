@@ -1,13 +1,13 @@
 services:
   - type: web
-    name: mon-projet-django
+    name: education_platform-django
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn nom_du_projet.wsgi
+    startCommand: gunicorn education_platform.wsgi
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: nom_du_projet.settings
+        value: education_platform.settings
       - key: SECRET_KEY
         value: votre_cle_secrete
       - key: DATABASE_URL
